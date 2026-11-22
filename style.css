@@ -499,3 +499,19 @@ li:last-child {
   border-radius: 8px;
   object-fit: contain;
 }
+/* ---------- MONNAIES ---------- */
+.montant {
+  font-size: 26px;
+  word-break: break-word;
+}
+
+.titre-devise {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texte-doux);
+  margin: 18px 0 10px;
+}
+
+.titre-devise:first-child {
+  margin-top: 0;
+}
