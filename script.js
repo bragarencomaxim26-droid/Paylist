@@ -180,7 +180,7 @@ function reinitialiserFormulaire() {
   champNom.value = "";
   champPrix.value = "";
   champFrequence.value = "mois";
-    champCategorie.value = "Choisir une catégorie";
+    champCategorie.value = "Vidéo et séries";
   champDate.value = "";
   messageErreur.textContent = "";
 
