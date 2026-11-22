@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PayList : tous tes abonnements au même endroit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- BARRE DE MENU -->
+  <header class="menu">
+    <div class="menu-contenu">
+      <a class="logo" href="#haut">PayList</a>
+      <nav class="liens">
+        <a href="#avantages">Avantages</a>
+        <a href="#tarifs">Tarifs</a>
+        <a class="bouton bouton-petit" href="#app">Commencer</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- SECTION D'ACCUEIL -->
+  <section class="hero" id="haut">
+    <span class="badge">100 % gratuit pour commencer</span>
+    <h1>Vois combien tu paies <span class="couleur">vraiment</span> chaque mois</h1>
+    <p class="hero-texte">
+      Netflix, Spotify, salle de sport… PayList rassemble tous tes abonnements
+      pour que tu ne te fasses plus piéger par un renouvellement.
+    </p>
+    <a class="bouton bouton-grand" href="#app">Ajouter mon premier abonnement</a>
+  </section>
+
+  <!-- AVANTAGES -->
+  <section class="avantages" id="avantages">
+    <div class="avantage">
+      <div class="icone">💶</div>
+      <h3>Le total en un coup d'œil</h3>
+      <p>Ce que tu paies par mois et par an, calculé automatiquement.</p>
+    </div>
+    <div class="avantage">
+      <div class="icone">📊</div>
+      <h3>Où part ton argent</h3>
+      <p>Un graphique par catégorie pour repérer les dépenses inutiles.</p>
+    </div>
+    <div class="avantage">
+      <div class="icone">⚡</div>
+      <h3>Simple et rapide</h3>
+      <p>Pas de compte à créer : ajoute un abonnement en 10 secondes.</p>
+    </div>
+  </section>
+
+    <!-- TARIFS -->
+  <section class="tarifs" id="tarifs">
+    <h2 class="titre-section">Des prix simples</h2>
+    <div class="offres">
+
+      <div class="offre">
+        <h3>Gratuit</h3>
+        <p class="prix">0 €<span>/mois</span></p>
+        <ul class="points">
+          <li>Jusqu'à 5 abonnements</li>
+          <li>Totaux par mois et par an</li>
+          <li>Graphique par catégorie</li>
+          <li>Alertes de renouvellement</li>
+        </ul>
+        <a class="bouton bouton-secondaire bouton-large" href="#app">Commencer</a>
+      </div>
+
+      <div class="offre offre-premium">
+        <span class="badge">Le plus choisi</span>
+        <h3>Premium</h3>
+        <p class="prix">4,99 €<span>/mois</span></p>
+        <ul class="points">
+          <li>Abonnements illimités</li>
+          <li>Tout ce qui est gratuit</li>
+          <li>Sauvegarde sur tous tes appareils (bientôt)</li>
+          <li>Alertes par e-mail (bientôt)</li>
+        </ul>
+        <button class="bouton bouton-large" disabled>Bientôt disponible</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- L'APPLICATION -->
+  <main class="contenu" id="app">
+    <h2 class="titre-section">Mon espace</h2>
+    <section id="alertes"></section>
+
+    <section class="totaux">
+      <div class="carte">
+        <p class="etiquette">Total par mois</p>
+        <p class="montant" id="total-mois">0,00 €</p>
+      </div>
+      <div class="carte">
+        <p class="etiquette">Total par an</p>
+        <p class="montant" id="total-an">0,00 €</p>
+      </div>
+    </section>
+
+    <section class="bloc">
+        <h2 id="titre-formulaire">Ajouter un abonnement</h2>
+      <div class="formulaire">
+        <input type="text" id="nom" placeholder="Nom (ex : Netflix)">
+        <input type="number" id="prix" placeholder="Prix (ex : 13.99)" step="0.01" min="0">
+        <select id="frequence">
+          <option value="mois">Par mois</option>
+          <option value="an">Par an</option>
+        </select>
+        <select id="categorie">
+          <option value="Loisirs">Loisirs</option>
+          <option value="Sport">Sport</option>
+          <option value="Travail">Travail</option>
+          <option value="Autre">Autre</option>
+        </select>
+        <label class="champ-date">
+          Prochain paiement (facultatif)
+          <input type="date" id="date-paiement">
+        </label>
+        <button class="bouton" id="bouton-ajouter">Ajouter</button>
+        <button class="bouton bouton-secondaire" id="bouton-annuler" style="display:none">Annuler</button>
+      </div>
+      <p class="erreur" id="erreur"></p>
+    </section>
+
+    <section class="bloc">
+      <h2>Répartition par catégorie</h2>
+      <div id="repartition"></div>
+    </section>
+
+    <section class="bloc">
+      <h2>Mes abonnements</h2>
+      <ul id="liste"></ul>
+      <p class="vide" id="vide">Aucun abonnement pour le moment.</p>
+    </section>
+  </main>
+
+  <!-- BAS DE PAGE -->
+  <footer class="pied">
+    <p>© 2026 PayList. Tous tes abonnements au même endroit.</p>
+    <p>Cette version est une version de test de Paylist</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
