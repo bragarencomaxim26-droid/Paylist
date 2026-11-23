@@ -323,3 +323,30 @@ liste.addEventListener("click", function (evenement) {
 
 // 18. Affichage au chargement de la page
 afficher();
+// ---------- MODE SOMBRE ----------
+const boutonTheme = document.getElementById("bouton-theme");
+
+function appliquerTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  boutonTheme.textContent = theme === "dark" ? "☀️" : "🌙";
+}
+
+// On récupère le thème choisi la dernière fois (clair par défaut)
+let themeActuel = "light";
+try {
+  themeActuel = localStorage.getItem("theme") || "light";
+} catch (erreur) {
+  themeActuel = "light";
+}
+appliquerTheme(themeActuel);
+
+// Quand on clique sur le bouton, on change de thème et on le sauvegarde
+boutonTheme.addEventListener("click", function () {
+  themeActuel = themeActuel === "dark" ? "light" : "dark";
+  appliquerTheme(themeActuel);
+  try {
+    localStorage.setItem("theme", themeActuel);
+  } catch (erreur) {
+    // Si le navigateur refuse de sauvegarder, ce n'est pas grave
+  }
+});
