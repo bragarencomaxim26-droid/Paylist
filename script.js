@@ -422,3 +422,10 @@ boutonExport.addEventListener("click", function () {
   document.body.removeChild(lien);
   URL.revokeObjectURL(lien.href);
 });
+// ---------- ÉCRAN VIDE ----------
+const boutonPremier = document.getElementById("bouton-premier");
+
+boutonPremier.addEventListener("click", function () {
+  titreFormulaire.scrollIntoView({ behavior: "smooth", block: "center" });
+  champNom.focus();
+});
