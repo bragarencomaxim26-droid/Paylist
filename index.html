@@ -155,8 +155,19 @@
     </section>
 
     <section class="bloc">
-      <h2>Mes abonnements</h2>
+      <div class="entete-liste">
+        <h2>Mes abonnements</h2>
+        <select id="tri">
+          <option value="ajout">Trier : ordre d'ajout</option>
+          <option value="prix">Trier : prix (du plus cher)</option>
+          <option value="date">Trier : prochain paiement</option>
+          <option value="nom">Trier : nom (A à Z)</option>
+        </select>
+      </div>
       <ul id="liste"></ul>
+      <button class="bouton bouton-secondaire" id="bouton-export" style="margin-top:16px">
+        Exporter ma liste (.csv)
+      </button>
       <p class="vide" id="vide">Aucun abonnement pour le moment.</p>
     </section>
   </main>

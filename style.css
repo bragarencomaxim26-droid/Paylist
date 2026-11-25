@@ -584,3 +584,16 @@ li:last-child {
 [data-theme="dark"] .supprimer:hover {
   background: #450a0a;
 }
+/* ---------- TRI ---------- */
+.entete-liste {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.entete-liste h2 {
+  margin-bottom: 0;
+}

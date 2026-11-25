@@ -14,6 +14,7 @@ const symboles = {
 };
 
 // 2. On récupère les éléments de la page
+const champTri = document.getElementById("tri");
 const champNom = document.getElementById("nom");
 const champPrix = document.getElementById("prix");
 const champDevise = document.getElementById("devise");
@@ -203,7 +204,46 @@ function afficherRepartition() {
 function afficher() {
   liste.innerHTML = "";
 
-  abonnements.forEach(function (abo, index) {
+  // On garde l'index d'origine de chaque abonnement,
+  // pour que "Modifier" et "Supprimer" visent toujours le bon
+  const elements = abonnements.map(function (abo, index) {
+    return { abo: abo, index: index };
+  });
+
+  // On trie selon le choix du menu
+  const tri = champTri.value;
+  elements.sort(function (a, b) {
+    if (tri === "prix") {
+      return prixParMois(b.abo) - prixParMois(a.abo);
+    }
+
+    if (tri === "nom") {
+      return a.abo.nom.localeCompare(b.abo.nom, "fr");
+    }
+
+    if (tri === "date") {
+      const dateA = prochaineDate(a.abo);
+      const dateB = prochaineDate(b.abo);
+
+      // Les abonnements sans date vont à la fin
+      if (dateA === null && dateB === null) {
+        return 0;
+      }
+      if (dateA === null) {
+        return 1;
+      }
+      if (dateB === null) {
+        return -1;
+      }
+      return dateA - dateB;
+    }
+
+    // Par défaut : ordre d'ajout
+    return a.index - b.index;
+  });
+
+  elements.forEach(function (element) {
+    const abo = element.abo;
     const date = prochaineDate(abo);
     const texteDate = date
       ? " · Prochain paiement : " + date.toLocaleDateString("fr-FR")
@@ -219,8 +259,8 @@ function afficher() {
         '</div>' +
       '</div>' +
       '<div class="actions">' +
-        '<button class="modifier" data-index="' + index + '">Modifier</button>' +
-        '<button class="supprimer" data-index="' + index + '">Supprimer</button>' +
+        '<button class="modifier" data-index="' + element.index + '">Modifier</button>' +
+        '<button class="supprimer" data-index="' + element.index + '">Supprimer</button>' +
       '</div>';
     liste.appendChild(ligne);
   });
@@ -232,22 +272,6 @@ function afficher() {
   totalAn.textContent = texteTotaux(totaux, 12);
   afficherRepartition();
   afficherAlertes();
-}
-
-// 14. Fonction qui remet le formulaire à zéro
-function reinitialiserFormulaire() {
-  champNom.value = "";
-  champPrix.value = "";
-  champDevise.value = "EUR";
-  champFrequence.value = "mois";
-  champCategorie.value = "Vidéo et séries";
-  champDate.value = "";
-  messageErreur.textContent = "";
-
-  indexModification = null;
-  boutonAjouter.textContent = "Ajouter";
-  boutonAnnuler.style.display = "none";
-  titreFormulaire.textContent = "Ajouter un abonnement";
 }
 
 // 15. Quand on clique sur "Ajouter" (ou "Enregistrer")
@@ -349,4 +373,52 @@ boutonTheme.addEventListener("click", function () {
   } catch (erreur) {
     // Si le navigateur refuse de sauvegarder, ce n'est pas grave
   }
+});
+// ---------- TRI ----------
+champTri.addEventListener("change", afficher);
+// ---------- EXPORT ----------
+const boutonExport = document.getElementById("bouton-export");
+
+// Entoure un texte de guillemets pour que le fichier reste correct
+function proteger(texte) {
+  return '"' + String(texte).replace(/"/g, '""') + '"';
+}
+
+boutonExport.addEventListener("click", function () {
+  if (abonnements.length === 0) {
+    messageErreur.textContent = "Ajoute au moins un abonnement avant d'exporter.";
+    return;
+  }
+
+  messageErreur.textContent = "";
+
+  // La première ligne : les titres des colonnes
+  const lignes = ["Nom;Prix;Monnaie;Frequence;Categorie;Prochain paiement"];
+
+  abonnements.forEach(function (abo) {
+    const date = prochaineDate(abo);
+    const texteDate = date ? date.toLocaleDateString("fr-FR") : "";
+
+    lignes.push([
+      proteger(abo.nom),
+      String(abo.prix).replace(".", ","),
+      abo.devise || "EUR",
+      abo.frequence,
+      proteger(abo.categorie || "Autre"),
+      texteDate
+    ].join(";"));
+  });
+
+  // Le "\uFEFF" permet à Excel d'afficher correctement les accents
+  const contenu = "\uFEFF" + lignes.join("\n");
+  const fichier = new Blob([contenu], { type: "text/csv;charset=utf-8;" });
+
+  // On crée un lien invisible et on clique dessus
+  const lien = document.createElement("a");
+  lien.href = URL.createObjectURL(fichier);
+  lien.download = "mes-abonnements-paylist.csv";
+  document.body.appendChild(lien);
+  lien.click();
+  document.body.removeChild(lien);
+  URL.revokeObjectURL(lien.href);
 });
