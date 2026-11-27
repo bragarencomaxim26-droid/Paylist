@@ -1,4 +1,12 @@
-// 1. On récupère les abonnements sauvegardés (ou une liste vide)
+// =====================================================
+//  PAYLIST : script.js
+//  Les fonctions sont rangées en parties numérotées.
+// =====================================================
+
+
+// ---------- 1. DONNÉES ----------
+
+// Les abonnements sauvegardés dans le navigateur (ou une liste vide)
 let abonnements = JSON.parse(localStorage.getItem("abonnements")) || [];
 
 // Quel abonnement est en train d'être modifié ? (null = aucun)
@@ -13,8 +21,11 @@ const symboles = {
   MDL: "lei"
 };
 
-// 2. On récupère les éléments de la page
-const champTri = document.getElementById("tri");
+
+// ---------- 2. ÉLÉMENTS DE LA PAGE ----------
+
+// Formulaire
+const titreFormulaire = document.getElementById("titre-formulaire");
 const champNom = document.getElementById("nom");
 const champPrix = document.getElementById("prix");
 const champDevise = document.getElementById("devise");
@@ -23,33 +34,43 @@ const champCategorie = document.getElementById("categorie");
 const champDate = document.getElementById("date-paiement");
 const boutonAjouter = document.getElementById("bouton-ajouter");
 const boutonAnnuler = document.getElementById("bouton-annuler");
-const titreFormulaire = document.getElementById("titre-formulaire");
+const messageErreur = document.getElementById("erreur");
+
+// Affichage
 const liste = document.getElementById("liste");
 const messageVide = document.getElementById("vide");
-const messageErreur = document.getElementById("erreur");
 const totalMois = document.getElementById("total-mois");
 const totalAn = document.getElementById("total-an");
 const repartition = document.getElementById("repartition");
 const alertes = document.getElementById("alertes");
 
-// 3. Fonction pour écrire un montant avec sa monnaie
+// Autres boutons
+const champTri = document.getElementById("tri");
+const boutonExport = document.getElementById("bouton-export");
+const boutonPremier = document.getElementById("bouton-premier");
+const boutonTheme = document.getElementById("bouton-theme");
+
+
+// ---------- 3. FONCTIONS UTILES ----------
+
+// Écrit un montant avec sa monnaie : 13,99 €
 function formaterMontant(valeur, devise) {
   const code = devise || "EUR";
   const symbole = symboles[code] || code;
   return valeur.toFixed(2).replace(".", ",") + " " + symbole;
 }
 
-// 4. Fonction qui sauvegarde dans le navigateur
+// Sauvegarde la liste dans le navigateur
 function sauvegarder() {
   localStorage.setItem("abonnements", JSON.stringify(abonnements));
 }
 
-// 5. Fonction qui convertit un prix en prix par mois
+// Convertit le prix d'un abonnement en prix par mois
 function prixParMois(abo) {
   return abo.frequence === "an" ? abo.prix / 12 : abo.prix;
 }
 
-// 6. Fonction qui calcule les totaux par mois, séparés par monnaie
+// Calcule les totaux par mois, séparés par monnaie
 function totauxParDevise() {
   const totaux = {};
   abonnements.forEach(function (abo) {
@@ -59,7 +80,7 @@ function totauxParDevise() {
   return totaux;
 }
 
-// 7. Fonction qui écrit les totaux : "25,00 € + 10,00 $"
+// Écrit les totaux : "25,00 € + 10,00 $"
 function texteTotaux(totaux, multiplicateur) {
   const devises = Object.keys(totaux);
 
@@ -74,7 +95,15 @@ function texteTotaux(totaux, multiplicateur) {
     .join(" + ");
 }
 
-// 8. Fonction qui calcule la prochaine date de paiement
+// Entoure un texte de guillemets (pour le fichier exporté)
+function proteger(texte) {
+  return '"' + String(texte).replace(/"/g, '""') + '"';
+}
+
+
+// ---------- 4. DATES ET ALERTES ----------
+
+// Calcule la prochaine date de paiement d'un abonnement
 function prochaineDate(abo) {
   if (!abo.date) {
     return null;
@@ -86,6 +115,7 @@ function prochaineDate(abo) {
   const aujourdhui = new Date();
   aujourdhui.setHours(0, 0, 0, 0);
 
+  // Si la date est passée, on avance d'un mois (ou d'un an)
   while (date < aujourdhui) {
     if (abo.frequence === "an") {
       date.setFullYear(date.getFullYear() + 1);
@@ -96,14 +126,14 @@ function prochaineDate(abo) {
   return date;
 }
 
-// 9. Fonction qui calcule le nombre de jours avant une date
+// Nombre de jours avant une date
 function joursRestants(date) {
   const aujourdhui = new Date();
   aujourdhui.setHours(0, 0, 0, 0);
   return Math.round((date - aujourdhui) / 86400000);
 }
 
-// 10. Fonction qui écrit "aujourd'hui", "demain" ou "dans X jours"
+// Écrit "aujourd'hui", "demain" ou "dans X jours"
 function texteDelai(jours) {
   if (jours === 0) {
     return "aujourd'hui";
@@ -114,7 +144,7 @@ function texteDelai(jours) {
   return "dans " + jours + " jours";
 }
 
-// 11. Fonction qui affiche les alertes
+// Affiche les alertes de renouvellement (7 jours ou moins)
 function afficherAlertes() {
   alertes.innerHTML = "";
   const liste7jours = [];
@@ -130,6 +160,7 @@ function afficherAlertes() {
     }
   });
 
+  // Les renouvellements les plus proches en premier
   liste7jours.sort(function (a, b) {
     return a.jours - b.jours;
   });
@@ -144,7 +175,9 @@ function afficherAlertes() {
   });
 }
 
-// 12. Fonction qui affiche le graphique par catégorie, un groupe par monnaie
+
+// ---------- 5. GRAPHIQUE PAR CATÉGORIE ----------
+
 function afficherRepartition() {
   repartition.innerHTML = "";
 
@@ -200,7 +233,9 @@ function afficherRepartition() {
   });
 }
 
-// 13. Fonction qui affiche tout à l'écran
+
+// ---------- 6. AFFICHAGE PRINCIPAL ----------
+
 function afficher() {
   liste.innerHTML = "";
 
@@ -242,6 +277,7 @@ function afficher() {
     return a.index - b.index;
   });
 
+  // On crée une ligne pour chaque abonnement
   elements.forEach(function (element) {
     const abo = element.abo;
     const date = prochaineDate(abo);
@@ -265,6 +301,7 @@ function afficher() {
     liste.appendChild(ligne);
   });
 
+  // Totaux, écran vide, graphique et alertes
   const totaux = totauxParDevise();
 
   messageVide.style.display = abonnements.length === 0 ? "block" : "none";
@@ -274,7 +311,26 @@ function afficher() {
   afficherAlertes();
 }
 
-// 15. Quand on clique sur "Ajouter" (ou "Enregistrer")
+
+// ---------- 7. FORMULAIRE ----------
+
+// Remet le formulaire à zéro
+function reinitialiserFormulaire() {
+  champNom.value = "";
+  champPrix.value = "";
+  champDevise.value = "EUR";
+  champFrequence.value = "mois";
+  champCategorie.value = "Vidéo et séries";
+  champDate.value = "";
+  messageErreur.textContent = "";
+
+  indexModification = null;
+  boutonAjouter.textContent = "Ajouter";
+  boutonAnnuler.style.display = "none";
+  titreFormulaire.textContent = "Ajouter un abonnement";
+}
+
+// Clic sur "Ajouter" (ou "Enregistrer" en mode modification)
 boutonAjouter.addEventListener("click", function () {
   const nom = champNom.value.trim();
   const prix = parseFloat(champPrix.value);
@@ -311,12 +367,12 @@ boutonAjouter.addEventListener("click", function () {
   afficher();
 });
 
-// 16. Quand on clique sur "Annuler"
+// Clic sur "Annuler"
 boutonAnnuler.addEventListener("click", function () {
   reinitialiserFormulaire();
 });
 
-// 17. Quand on clique sur "Modifier" ou "Supprimer" dans la liste
+// Clic sur "Modifier" ou "Supprimer" dans la liste
 liste.addEventListener("click", function (evenement) {
   const index = Number(evenement.target.getAttribute("data-index"));
 
@@ -345,44 +401,21 @@ liste.addEventListener("click", function (evenement) {
   }
 });
 
-// 18. Affichage au chargement de la page
-afficher();
-// ---------- MODE SOMBRE ----------
-const boutonTheme = document.getElementById("bouton-theme");
 
-function appliquerTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  boutonTheme.textContent = theme === "dark" ? "☀️" : "🌙";
-}
+// ---------- 8. TRI ----------
 
-// On récupère le thème choisi la dernière fois (clair par défaut)
-let themeActuel = "light";
-try {
-  themeActuel = localStorage.getItem("theme") || "light";
-} catch (erreur) {
-  themeActuel = "light";
-}
-appliquerTheme(themeActuel);
-
-// Quand on clique sur le bouton, on change de thème et on le sauvegarde
-boutonTheme.addEventListener("click", function () {
-  themeActuel = themeActuel === "dark" ? "light" : "dark";
-  appliquerTheme(themeActuel);
-  try {
-    localStorage.setItem("theme", themeActuel);
-  } catch (erreur) {
-    // Si le navigateur refuse de sauvegarder, ce n'est pas grave
-  }
-});
-// ---------- TRI ----------
 champTri.addEventListener("change", afficher);
-// ---------- EXPORT ----------
-const boutonExport = document.getElementById("bouton-export");
 
-// Entoure un texte de guillemets pour que le fichier reste correct
-function proteger(texte) {
-  return '"' + String(texte).replace(/"/g, '""') + '"';
-}
+
+// ---------- 9. ÉCRAN VIDE ----------
+
+boutonPremier.addEventListener("click", function () {
+  titreFormulaire.scrollIntoView({ behavior: "smooth", block: "center" });
+  champNom.focus();
+});
+
+
+// ---------- 10. EXPORT (.csv) ----------
 
 boutonExport.addEventListener("click", function () {
   if (abonnements.length === 0) {
@@ -422,10 +455,37 @@ boutonExport.addEventListener("click", function () {
   document.body.removeChild(lien);
   URL.revokeObjectURL(lien.href);
 });
-// ---------- ÉCRAN VIDE ----------
-const boutonPremier = document.getElementById("bouton-premier");
 
-boutonPremier.addEventListener("click", function () {
-  titreFormulaire.scrollIntoView({ behavior: "smooth", block: "center" });
-  champNom.focus();
+
+// ---------- 11. MODE SOMBRE ----------
+
+function appliquerTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  boutonTheme.textContent = theme === "dark" ? "☀️" : "🌙";
+}
+
+// On récupère le thème choisi la dernière fois (clair par défaut)
+let themeActuel = "light";
+try {
+  themeActuel = localStorage.getItem("theme") || "light";
+} catch (erreur) {
+  themeActuel = "light";
+}
+appliquerTheme(themeActuel);
+
+// Clic sur le bouton : on change de thème et on le sauvegarde
+boutonTheme.addEventListener("click", function () {
+  themeActuel = themeActuel === "dark" ? "light" : "dark";
+  appliquerTheme(themeActuel);
+  try {
+    localStorage.setItem("theme", themeActuel);
+  } catch (erreur) {
+    // Si le navigateur refuse de sauvegarder, ce n'est pas grave
+  }
 });
+
+
+// ---------- 12. DÉMARRAGE ----------
+
+// Affichage au chargement de la page
+afficher();
